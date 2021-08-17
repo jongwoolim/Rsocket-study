@@ -4,6 +4,7 @@ import me.jongwoo.rsocketserver.repository.Item;
 import me.jongwoo.rsocketserver.repository.ItemRepository;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
@@ -25,5 +26,11 @@ public class RSocketService {
 //                .doOnNext(savedItem -> this.itemSink.next(savedItem)); // <4>
         //  Deprecated인 FluxProcessor, EmitterProcessor의 대체 구현
 				.doOnNext(savedItem -> this.itemsSink.tryEmitNext(savedItem));
+    }
+
+    @MessageMapping("newItems.request-stream")
+    public Flux<Item> findItemsViaRSocketRequestStream(){
+        return this.repository.findAll()
+                .doOnNext(this.itemsSink::tryEmitNext);
     }
 }
