@@ -33,4 +33,10 @@ public class RSocketService {
         return this.repository.findAll()
                 .doOnNext(this.itemsSink::tryEmitNext);
     }
+
+    @MessageMapping("newItems.fire-and-forget")
+    public Mono<Void> processNewItemsViaRSocketFireAndForget(Item item){
+        return this.repository.save(item)
+                .doOnNext(savedItem -> this.itemsSink.tryEmitNext(savedItem)).then();
+    }
 }
