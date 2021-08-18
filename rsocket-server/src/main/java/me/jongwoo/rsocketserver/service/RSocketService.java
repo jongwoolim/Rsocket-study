@@ -39,4 +39,9 @@ public class RSocketService {
         return this.repository.save(item)
                 .doOnNext(savedItem -> this.itemsSink.tryEmitNext(savedItem)).then();
     }
+
+    @MessageMapping("newItems.monitor")
+    public Flux<Item> monitorNewItems(){
+        return this.itemsSink.asFlux();
+    }
 }
