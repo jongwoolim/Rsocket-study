@@ -61,4 +61,12 @@ public class RScoketController {
                 .then(
                         Mono.just(ResponseEntity.created(URI.create("/items/fire-and-forget")).build()));
     }
+
+    @GetMapping(value = "/items", produces = TEXT_EVENT_STREAM_VALUE)
+    public Flux<Item> liveUpdates(){
+        return this.requester
+                .flatMapMany(rSocketRequester -> rSocketRequester
+                    .route("newItems.monitor")
+                    .retrieveFlux(Item.class));
+    }
 }
